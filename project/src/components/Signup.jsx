@@ -1,125 +1,108 @@
-import { useState } from "react"; 
-import { Link } from "react-router-dom";
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
+const Signup = ({ setLoggedIn }) => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [nameError, setNameError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const navigate = useNavigate();
 
-export default function Signup() { 
-	// States for registration 
-	const [name, setName] = useState(""); 
-	const [email, setEmail] = useState(""); 
-	const [password, setPassword] = useState(""); 
+  const handleSubmit = () => {
+    // Reset error messages
+    setNameError('');
+    setEmailError('');
+    setPasswordError('');
 
-	// States for checking the errors 
-	const [submitted, setSubmitted] = useState(false); 
-	const [error, setError] = useState(false); 
+    // Validate name
+    if (!name) {
+      setNameError('Please enter your name');
+      return;
+    }
 
-	// Handling the name change 
-	const handleName = (e) => { 
-		setName(e.target.value); 
-		setSubmitted(false); 
-	}; 
+    // Validate email
+    if (!email) {
+      setEmailError('Please enter your email');
+      return;
+    }
 
-	// Handling the email change 
-	const handleEmail = (e) => { 
-		setEmail(e.target.value); 
-		setSubmitted(false); 
-	}; 
+    // Validate password
+    if (!password) {
+      setPasswordError('Please enter your password');
+      return;
+    }
 
-	// Handling the password change 
-	const handlePassword = (e) => { 
-		setPassword(e.target.value); 
-		setSubmitted(false); 
-	}; 
+    // Assuming your signup API endpoint is at /api/auth/register
+    fetch('http://localhost:5000/api/auth/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name, email, password }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.message === 'User registered successfully') {
+          // Signup successful
+          setLoggedIn(true);
+          navigate('/');
+        } else {
+          // Signup failed
+          setEmailError(data.message);
+        }
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        setEmailError('Something went wrong. Please try again later.');
+      });
+  };
 
-	// Handling the form submission 
-	const handleSubmit = (e) => { 
-		e.preventDefault(); 
-		if (name === "" || email === "" || password === "") { 
-			setError(true); 
-		} else { 
-			setSubmitted(true); 
-			setError(false); 
-		} 
-	}; 
-
-	// Showing success message 
-	const successMessage = () => { 
-		return ( 
-			<div 
-				className="success"
-				style={{ 
-					display: submitted ? "" : "none", 
-				}} 
-			> 
-				<h1>User {name} successfully registered!!</h1> 
-			</div> 
-		); 
-	}; 
-
-	// Showing error message if error is true 
-	const errorMessage = () => { 
-		return ( 
-			<div 
-				className="error"
-				style={{ 
-					display: error ? "" : "none", 
-				}} 
-			> 
-				<h1>Please enter all the fields</h1> 
-			</div> 
-		); 
-	}; 
-
-	return ( 
-		<div className="mainContainer"> 
-			<div className="titleContainer"> 
-				<h1>User Registration</h1> 
-			</div> 
-
-			{/* Calling to the methods */} 
-			<div className="messages"> 
-				{errorMessage()} 
-				{successMessage()} 
-			</div> 
-
-			<form> 
-				{/* Labels and inputs for form data */} 
-				<div className="inputContainer">
-					<label className="label">Name</label> 
-					<input 
-						onChange={handleName} 
-						className="inputBox"
-						value={name} 
-						type="text"
-					/> 
-				</div>
-
-				<div className="inputContainer">
-					<label className="label">Email</label> 
-					<input 
-						onChange={handleEmail} 
-						className="inputBox"
-						value={email} 
-						type="email"
-					/> 
-				</div>
-
-				<div className="inputContainer">
-					<label className="label">Password</label> 
-					<input 
-						onChange={handlePassword} 
-						className="inputBox"
-						value={password} 
-						type="password"
-					/> 
-				</div>
-
-				<button onClick={handleSubmit} className="inputButton" type="submit"> 
-					Submit 
-				</button> 
-			</form> 
-            <div>
-        Already have an account? <Link to="/login">Login</Link>
+  return (
+    <div className="mainContainer">
+      <div className={'titleContainer'}>
+        <div>Signup</div>
       </div>
-		</div> 
-	); 
-}   
+      <div className={'inputContainer'}>
+        <input
+          value={name}
+          placeholder="Enter your name"
+          onChange={(ev) => setName(ev.target.value)}
+          className={'inputBox'}
+        />
+        <label className="errorLabel">{nameError}</label>
+      </div>
+      <br />
+      <div className={'inputContainer'}>
+        <input
+          value={email}
+          placeholder="Enter your email"
+          onChange={(ev) => setEmail(ev.target.value)}
+          className={'inputBox'}
+        />
+        <label className="errorLabel">{emailError}</label>
+      </div>
+      <br />
+      <div className={'inputContainer'}>
+        <input
+          value={password}
+          placeholder="Enter your password"
+          onChange={(ev) => setPassword(ev.target.value)}
+          className={'inputBox'}
+          type="password"
+        />
+        <label className="errorLabel">{passwordError}</label>
+      </div>
+      <br />
+      <div className={'inputContainer'}>
+        <input className={'inputButton'} type="button" onClick={handleSubmit} value={'Sign up'} />
+      </div>
+      <div>
+        Already registered? <span onClick={() => navigate('/login')} style={{ cursor: 'pointer', color: 'blue' }}>Login</span>
+      </div>
+    </div>
+  );
+};
+
+export default Signup;

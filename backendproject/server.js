@@ -4,6 +4,8 @@ const port = 5000;
 const authRoutes = require('./routes/auth');
 
 app.use(express.json());
+const cors = require('cors');
+app.use(cors());
 
 app.get('/', (req, res) => {
   res.send('Hello from the backend!');
