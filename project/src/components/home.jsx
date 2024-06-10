@@ -5,21 +5,23 @@ const Home = ({ loggedIn, email, setLoggedIn }) => {
   const navigate = useNavigate();
 
   const onLoginButtonClick = () => {
-    // Redirect to login page when button is clicked
-    navigate('/login');
-  }
+    if (loggedIn) {
+      setLoggedIn(false);
+      // Clear user session or token if necessary
+    } else {
+      navigate('/login');
+    }
+  };
 
   const onStudentListButtonClick = () => {
-    // Redirect to student list page when button is clicked
     navigate('/students');
-  }
+  };
 
   return (
     <div className="mainContainer">
       <div className="titleContainer">
         <div>Welcome! To Degree Request Page. Login to move ahead. Keep your marksheet and Aadhar details ready.</div>
       </div>
-      <div>This is the home page.</div>
       <div className="buttonContainer">
         <input
           className="inputButton"
@@ -27,7 +29,7 @@ const Home = ({ loggedIn, email, setLoggedIn }) => {
           onClick={onLoginButtonClick}
           value={loggedIn ? 'Log out' : 'Log in'}
         />
-        {loggedIn && <div>Your email address is {email}</div>}
+        {loggedIn && <div className="emailInfo">Your email address is {email}</div>}
         <input
           className="inputButton"
           type="button"
@@ -37,6 +39,6 @@ const Home = ({ loggedIn, email, setLoggedIn }) => {
       </div>
     </div>
   );
-}
+};
 
 export default Home;
